@@ -1018,11 +1018,15 @@ int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
     CVector position;
     float   radius;
     SString elementType;
+    unsigned char interior;
+    unsigned short dimension;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(position);
     argStream.ReadNumber(radius);
     argStream.ReadString(elementType, "");
+    argStream.ReadNumber(interior, 0);
+    argStream.ReadNumber(dimension, 0);
 
     if (!argStream.HasErrors())
     {
@@ -1037,9 +1041,12 @@ int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
         {
             if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
             {
-                lua_pushnumber(luaVM, ++index);
-                lua_pushelement(luaVM, entity);
-                lua_settable(luaVM, -3);
+                if (entity->GetInterior() == interior && entity->GetDimension() == dimension)
+                {
+                    lua_pushnumber(luaVM, ++index);
+                    lua_pushelement(luaVM, entity);
+                    lua_settable(luaVM, -3);
+                }
             }
         }
 
